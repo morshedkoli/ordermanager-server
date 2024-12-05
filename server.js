@@ -12,7 +12,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // Frontend URL
+    origin: "https://ordermanager-client.vercel.app", // Frontend URL
     methods: "GET,POST,PUT,DELETE, PATCH",
     credentials: true,
   })
