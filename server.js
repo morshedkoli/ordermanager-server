@@ -10,13 +10,7 @@ const dbURI = process.env.MONGO_URI;
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    origin: "https://ordermanager-client.vercel.app", // Frontend URL
-    methods: "GET,POST,PUT,DELETE, PATCH",
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 // Routes

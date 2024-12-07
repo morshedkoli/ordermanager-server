@@ -105,36 +105,38 @@ router.get("/:id", authenticateToken, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
-    const orderId = req.params.id;
-    const userId = req.user.id;
+    const orderId = req.params.id; // Order ID from params
+    const userId = req.user.id; // Authenticated user ID from token
+    const { username, password, moreInfo, paidAmount } = req.body; // Destructure incoming data
 
-    // Get paidAmount from the request body and ensure it's a valid number
-    let { paidAmount } = req.body;
-    paidAmount = parseFloat(paidAmount);
-
-    if (isNaN(paidAmount)) {
+    // Validate `paidAmount` if provided
+    let newPaidAmount = parseFloat(paidAmount);
+    if (paidAmount !== undefined && isNaN(newPaidAmount)) {
       return res.status(400).json({ error: "Invalid paidAmount value" });
     }
 
     // Find the order by ID and ensure it belongs to the authenticated user
     const order = await Order.findOne({ _id: orderId, userId });
-
     if (!order) {
       return res.status(404).json({ error: "Order not found or unauthorized" });
     }
 
-    // Increment the paid amount with the new value
-    order.paidAmount += paidAmount;
+    // Update fields only if they are provided
+    if (username !== undefined) order.username = username;
+    if (password !== undefined) order.password = password;
+    if (moreInfo !== undefined) order.moreInfo = moreInfo;
+    if (paidAmount !== undefined) order.paidAmount += newPaidAmount;
 
     // Save the updated order
-    await order.save();
+    const updatedOrder = await order.save();
 
-    res.status(200).json(order);
+    res
+      .status(200)
+      .json({ message: "Order updated successfully", updatedOrder });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
